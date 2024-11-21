@@ -1,0 +1,36 @@
+with "config/stm32_uart_demo_config.gpr";
+with "config/stm32_hal_config.gpr";
+project Stm32_Uart_Demo is
+
+   for Target use "arm-eabi";
+   
+   Runtime_Device := "";
+   case stm32_hal_config.DEVICE is
+      when "stm32f407xx" =>
+         Runtime_Device := "stm32f4";
+      when "stm32f429" =>
+         Runtime_Device := "stm32f429disco";
+      when "stm32f746" =>
+         Runtime_Device := "stm32f746disco";
+   end case;
+   for Runtime ("Ada") use "embedded-" & Runtime_Device;
+
+   for Source_Dirs use ("src/", "config/");
+   for Object_Dir use "obj/" & Stm32_Uart_Demo_Config.Build_Profile;
+   for Create_Missing_Dirs use "True";
+   for Exec_Dir use "bin";
+   for Main use ("stm32_uart_blocking_demo.adb");
+
+   package Compiler is
+      for Default_Switches ("Ada") use Stm32_Uart_Demo_Config.Ada_Compiler_Switches;
+   end Compiler;
+
+   package Binder is
+      for Switches ("Ada") use ("-Es"); --  Symbolic traceback
+   end Binder;
+
+   package Install is
+      for Artifacts (".") use ("share");
+   end Install;
+
+end Stm32_Uart_Demo;
