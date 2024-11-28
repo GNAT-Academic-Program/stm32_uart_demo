@@ -41,16 +41,24 @@ procedure Stm32_Uart_Blocking_Demo is
       elsif Data = Split_Char then
          case Current_State is
             when Sentence_Type =>
-               Message.Sentence := Sentence_T'Value (Buffer (1 .. Pos_In_buffer)); 
-               return Time_UTC;
+               if Sentence_T'Value (Buffer (1 .. Pos_In_buffer)) = GGA then
+                  Message.Sentence := Sentence_T'Value (Buffer (1 .. Pos_In_buffer)); 
+                  Pos_In_buffer := 1;
+                  return Time_UTC;
+               else
+                  return Invalid;
+               end if;
             when Time_UTC =>
                Message.Time_UTC := Natural'Value (Buffer (1 .. Pos_In_buffer));
+               Pos_In_buffer := 1;
                return Latitude;
             when Latitude =>
                Message.Latitude := Latitude_T'Value (Buffer (1 .. Pos_In_buffer));
+               Pos_In_buffer := 1;
                return Longitude;
             when Longitude =>
                Message.Longitude := Longitude_T'Value (Buffer (1 .. Pos_In_buffer));
+               Pos_In_buffer := 1;
                Screen_Draw.Display_Msg (Img (Message));
                Message := (others => <>);
                return Invalid;
@@ -71,6 +79,8 @@ begin
       Current_Char := Character'Val (Rcv_Data);
       State := Update_State (Current_Char, State);
       Buffer (Pos_In_buffer) := Current_Char;
-      Pos_In_buffer := Pos_In_buffer + 1;
+      if State /= Invalid then
+         Pos_In_buffer := Pos_In_buffer + 1;
+      end if;
    end loop;
 end Stm32_Uart_Blocking_Demo;
