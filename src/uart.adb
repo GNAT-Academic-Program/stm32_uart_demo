@@ -3,8 +3,8 @@ with STM32.GPIO;    use STM32.GPIO;
 
 package body Uart is
 
-   TX_Pin : constant GPIO_Point := PA9;
-   RX_Pin : constant GPIO_Point := PA10;
+   TX_Pin : constant GPIO_Point := PA2;
+   RX_Pin : constant GPIO_Point := PA3;
 
    --------------------------
    -- Initialize_UART_GPIO --
@@ -12,13 +12,13 @@ package body Uart is
 
    procedure Initialize_UART_GPIO is
    begin
-      Enable_Clock (USART_1);
+      Enable_Clock (USART_2);
       Enable_Clock (RX_Pin & TX_Pin);
 
       Configure_IO
         (RX_Pin & TX_Pin,
          (Mode           => Mode_AF,
-          AF             => GPIO_AF_USART1_7,
+          AF             => GPIO_AF_USART2_7,
           Resistors      => Pull_Up,
           AF_Speed       => Speed_50MHz,
           AF_Output_Type => Push_Pull));
